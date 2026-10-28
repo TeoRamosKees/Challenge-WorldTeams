@@ -23,6 +23,14 @@ function initialAccounts() {
       registered: true,
       confirmed: true,
     },
+    {
+      id: "33333333-3333-4333-8333-333333333333",
+      email: "sofia.martinez@example.com",
+      name: "Sofía Martínez",
+      active: true,
+      registered: true,
+      confirmed: true,
+    },
   ];
 }
 
@@ -80,7 +88,11 @@ http
       const url = new URL(req.url, "http://localhost");
       if (req.method === "POST" && url.pathname === "/__test/reset") {
         await pm.state.set("supabase.accounts", initialAccounts());
+        await pm.state.set("supabase.referrals", []);
         return send(200, { mock: "worldteams-supabase-auth" });
+      }
+      if (req.method === "GET" && url.pathname === "/__test/referrals") {
+        return send(200, (await pm.state.get("supabase.referrals")) || []);
       }
       const body = req.body || {};
       const accounts =
@@ -91,6 +103,22 @@ http
       const current = accounts.find(
         (entry) => entry.token && entry.token === token,
       );
+
+      if (req.method === "POST" && url.pathname === "/rest/v1/rpc/create_referral") {
+        if (token !== "clave-service-role-ficticia")
+          return send(403, { code: "42501", message: "Solo backend" });
+        if (!accounts.some((entry) => entry.id === body.p_referrer_id && entry.active && entry.confirmed))
+          return send(403, { code: "42501", message: "Empleado inactivo" });
+        if (body.p_email === "fallo@example.com")
+          return send(500, { code: "XX000", message: "Falla interna ficticia" });
+        const referrals = (await pm.state.get("supabase.referrals")) || [];
+        if (referrals.some((entry) => entry.email === body.p_email))
+          return send(409, { code: "23505", message: "Referido duplicado" });
+        const referral = { id: randomUUID(), candidate_id: randomUUID(), referrer_id: body.p_referrer_id, email: body.p_email };
+        referrals.push(referral);
+        await pm.state.set("supabase.referrals", referrals);
+        return send(200, { id: referral.id, candidate_id: referral.candidate_id });
+      }
 
       if (req.method === "POST" && url.pathname === "/auth/v1/signup") {
         if (!account?.active)

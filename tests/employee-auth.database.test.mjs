@@ -240,3 +240,118 @@ test("el trigger no puede invocarse directamente desde las APIs", async () => {
   );
   assert.equal(rows[0].allowed, false);
 });
+
+async function createReferral(email = "nuevo@example.com", referrerEmail = "lucia.garcia@example.com") {
+  return db.query(`
+    select public.create_referral(
+      (select id from public.referrers where email = $1),
+      $2, 'Nuevo candidato', 'engineering', null, null, null, 'Una recomendación'
+    ) as referral
+  `, [referrerEmail, email]);
+}
+
+test("la RPC crea candidato qualified y referral sin embedding ni consentimiento", async () => {
+  await db.exec("set local role service_role");
+  const { rows: [{ referral }] } = await createReferral("  NUEVO@EXAMPLE.COM  ");
+  const { rows: [candidate] } = await db.query("select * from public.candidates where id = $1", [referral.candidate_id]);
+  assert.equal(candidate.email, "nuevo@example.com");
+  assert.equal(candidate.status, "qualified");
+  assert.equal(candidate.profile_embedding, null);
+  assert.equal(candidate.consent_confirmed, false);
+  assert.equal(candidate.country, null);
+  assert.equal(candidate.notes, "Una recomendación");
+  assert.equal((await db.query("select candidate_id from public.referrals where id = $1", [referral.id])).rows[0].candidate_id, candidate.id);
+});
+
+test("rechaza el mismo referido por email normalizado sin modificar al candidato", async () => {
+  await db.exec("set local role service_role");
+  const { rows: [{ referral }] } = await createReferral();
+  const before = (await db.query("select * from public.candidates where id = $1", [referral.candidate_id])).rows;
+  await db.exec("savepoint duplicate_referral");
+  await assert.rejects(createReferral("  NUEVO@EXAMPLE.COM  "), { code: "23505" });
+  await db.exec("rollback to savepoint duplicate_referral");
+  assert.deepEqual((await db.query("select * from public.candidates where id = $1", [referral.candidate_id])).rows, before);
+  assert.equal((await db.query("select * from public.referrals where candidate_id = $1", [referral.candidate_id])).rows.length, 1);
+});
+
+test("rechaza otro referrer por el mismo email y conserva el primer referral y candidato", async () => {
+  await db.exec(`update auth.users set email_confirmed_at = now() where id = '${mateo}'`);
+  await db.exec("set local role service_role");
+  const first = (await createReferral()).rows[0].referral;
+  const originalCandidate = (await db.query("select * from public.candidates where id = $1", [first.candidate_id])).rows;
+  const originalReferral = (await db.query("select * from public.referrals where id = $1", [first.id])).rows;
+  await db.exec("savepoint other_referrer");
+  await assert.rejects(
+    createReferral("  NUEVO@EXAMPLE.COM  ", "mateo.rodriguez@example.com"),
+    { code: "23505" },
+  );
+  await db.exec("rollback to savepoint other_referrer");
+  assert.deepEqual((await db.query("select * from public.candidates where id = $1", [first.candidate_id])).rows, originalCandidate);
+  assert.deepEqual((await db.query("select * from public.referrals where candidate_id = $1", [first.candidate_id])).rows, originalReferral);
+  await db.exec("reset role");
+  await asEmployee(mateo);
+  assert.equal((await db.query("select * from public.candidates where id = $1", [first.candidate_id])).rows.length, 0);
+});
+
+test("califica candidatos submitted y conserva los estados posteriores y el perfil existente", async () => {
+  await db.exec(`
+    insert into public.candidates (email, full_name, status) values
+      ('submitted@example.com', 'Perfil original', 'submitted'),
+      ('hired@example.com', 'Perfil contratado', 'hired'),
+      ('rejected@example.com', 'Perfil rechazado', 'rejected');
+    set local role service_role;
+  `);
+  for (const status of ["submitted", "hired", "rejected"]) {
+    await createReferral(`${status}@example.com`);
+  }
+  const { rows } = await db.query("select email, full_name, status from public.candidates where email in ('submitted@example.com', 'hired@example.com', 'rejected@example.com') order by email");
+  assert.deepEqual(rows, [
+    { email: "hired@example.com", full_name: "Perfil contratado", status: "hired" },
+    { email: "rejected@example.com", full_name: "Perfil rechazado", status: "rejected" },
+    { email: "submitted@example.com", full_name: "Perfil original", status: "qualified" },
+  ]);
+});
+
+test("una falla al insertar el referral revierte la creación del candidato", async () => {
+  await db.exec(`
+    create function private.reject_test_referral() returns trigger language plpgsql as $$
+    begin raise exception 'Falla de escritura de prueba'; end;
+    $$;
+    create trigger reject_test_referral before insert on public.referrals
+      for each row execute function private.reject_test_referral();
+    set local role service_role;
+    savepoint failed_referral;
+  `);
+  await assert.rejects(createReferral(), /Falla de escritura de prueba/);
+  await db.exec("rollback to savepoint failed_referral");
+  assert.equal((await db.query("select * from public.candidates where email = 'nuevo@example.com'")).rows.length, 0);
+});
+
+test("la RPC bloquea empleados inactivos, sin cuenta y candidatos archivados", async () => {
+  await db.exec(`update public.referrers set active = false where auth_user_id = '${lucia}'`);
+  await db.exec("set local role service_role; savepoint inactive_referral");
+  await assert.rejects(createReferral(), { code: "42501" });
+  await db.exec("rollback to savepoint inactive_referral; savepoint unlinked_referral");
+  await assert.rejects(createReferral("nuevo@example.com", "mateo.rodriguez@example.com"), { code: "42501" });
+  await db.exec("rollback to savepoint unlinked_referral; reset role");
+  await db.exec(`
+    update public.referrers set active = true where auth_user_id = '${lucia}';
+    insert into public.candidates (email, full_name, deleted_at) values ('archivado@example.com', 'Archivado', now());
+    set local role service_role;
+    savepoint archived_referral;
+  `);
+  await assert.rejects(createReferral("archivado@example.com"), { code: "P0002" });
+  await db.exec("rollback to savepoint archived_referral");
+  assert.equal((await db.query("select status from public.candidates where email = 'archivado@example.com'")).rows[0].status, "submitted");
+});
+
+test("solo service_role puede ejecutar la RPC y el navegador no obtiene escrituras directas", async () => {
+  for (const role of ["anon", "authenticated", "service_role"]) {
+    const { rows: [permissions] } = await db.query(`
+      select has_function_privilege($1, 'public.create_referral(uuid,text,text,text,text,text,text,text)', 'execute') as execute,
+        has_table_privilege($1, 'public.candidates', 'insert') as insert
+    `, [role]);
+    assert.equal(permissions.execute, role === "service_role");
+    assert.equal(permissions.insert, role === "service_role");
+  }
+});

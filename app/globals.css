@@ -154,6 +154,47 @@ body {
   overflow: hidden;
 }
 
+.referral-program {
+  margin-top: 28px;
+  padding: 24px 28px;
+  background: #f1f5e9;
+}
+
+.referral-program h2 {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -.3px;
+}
+
+.referral-program-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  margin-top: 20px;
+  padding-left: 20px;
+  list-style: decimal;
+}
+
+.referral-program-steps li::marker {
+  color: #567a2b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.referral-program-steps h3 {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.referral-program-steps p {
+  margin-top: 5px;
+  color: var(--portal-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
 .portal-loading-card {
   padding: 24px 28px;
 }
@@ -440,6 +481,12 @@ body {
   margin: 28px 0;
 }
 
+.referral-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 .referral-review-data > div {
   padding-bottom: 17px;
   border-bottom: 1px solid var(--portal-line);
@@ -592,6 +639,13 @@ body {
 }
 
 @media (max-width: 700px) {
+  .referral-program {
+    padding: 24px 20px;
+  }
+  .referral-program-steps {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
   .portal-loading-card {
     padding: 24px 20px;
   }

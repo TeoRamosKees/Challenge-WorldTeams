@@ -4,6 +4,38 @@ import { logout } from "@/app/auth/actions";
 import { ReferralForm } from "@/app/referrals/referral-form";
 import { requireEmployee } from "@/utils/supabase/auth";
 
+function ReferralProgramCard() {
+  return (
+    <section
+      className="referral-card referral-program"
+      aria-labelledby="referral-program-title"
+    >
+      <h2 id="referral-program-title">¿Cómo funciona el programa?</h2>
+      <ol className="referral-program-steps">
+        <li>
+          <h3>Referí a alguien de tu red</h3>
+          <p>
+            Completá el formulario y enviá su perfil a nuestra base de candidatos.
+          </p>
+        </li>
+        <li>
+          <h3>Si se contrata, te avisamos</h3>
+          <p>
+            Cuando tu referido es contratado, se genera una recompensa y te
+            notificamos.
+          </p>
+        </li>
+        <li>
+          <h3>Cobrá tu bono</h3>
+          <p>
+            Recibís un bono por cada contratación de una persona que hayas referido.
+          </p>
+        </li>
+      </ol>
+    </section>
+  );
+}
+
 async function Landing() {
   const { employee } = await requireEmployee();
 
@@ -44,6 +76,7 @@ async function Landing() {
             encantaría trabajar.
           </p>
         </div>
+        <ReferralProgramCard />
         <div className="portal-form">
           <ReferralForm />
         </div>
@@ -83,6 +116,7 @@ function PortalLoading() {
             oportunidad.
           </p>
         </div>
+        <ReferralProgramCard />
         <section
           className="referral-card portal-form portal-loading-card"
           aria-label="Cargando tu portal"

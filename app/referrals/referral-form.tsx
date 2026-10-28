@@ -22,6 +22,10 @@ type ReferralDraft = {
 
 export function ReferralForm() {
   const [draft, setDraft] = useState<ReferralDraft | null>(null);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const form = useRef<HTMLFormElement>(null);
   const reviewHeading = useRef<HTMLHeadingElement>(null);
   const formIntro = useRef<HTMLDivElement>(null);
   const hasReviewed = useRef(false);
@@ -39,6 +43,7 @@ export function ReferralForm() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const value = (name: string) => String(data.get(name) ?? "").trim();
+    setError(null);
 
     setDraft({
       full_name: value("full_name"),
@@ -51,9 +56,34 @@ export function ReferralForm() {
     });
   }
 
+  async function submitReferral() {
+    if (!draft || pending) return;
+    setPending(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/referrals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(draft),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        setError(result.error || "No pudimos guardar el referido.");
+        return;
+      }
+      setSubmitted(true);
+    } catch {
+      setError(
+        "No pudimos confirmar el envío. Revisá tu conexión e intentá nuevamente.",
+      );
+    } finally {
+      setPending(false);
+    }
+  }
+
   return (
     <section className="referral-card" aria-label="Nuevo referido">
-      <form onSubmit={reviewReferral} hidden={draft !== null}>
+      <form ref={form} onSubmit={reviewReferral} hidden={draft !== null}>
         <div
           className="referral-form-intro referral-edit-intro"
           ref={formIntro}
@@ -175,8 +205,7 @@ export function ReferralForm() {
 
         <div className="referral-form-footer">
           <p>
-            Por ahora podés completar y revisar los datos. El referido todavía
-            no se enviará ni se guardará.
+            Vas a poder revisar los datos antes de enviar el referido.
           </p>
           <button className="referral-primary-button" type="submit">
             Revisar referido <span aria-hidden="true">↗</span>
@@ -188,9 +217,13 @@ export function ReferralForm() {
         <div className="referral-review">
           <div className="referral-form-intro">
             <h2 ref={reviewHeading} tabIndex={-1}>
-              Revisá tu referido
+              {submitted ? "Referido enviado" : "Revisá tu referido"}
             </h2>
-            <p>Así se ve la información que completaste.</p>
+            <p>
+              {submitted
+                ? "Guardamos tu recomendación correctamente."
+                : "Confirmá los datos antes de enviar tu recomendación."}
+            </p>
           </div>
           <dl className="referral-review-data">
             {[
@@ -212,20 +245,38 @@ export function ReferralForm() {
               </div>
             ))}
           </dl>
-          <div className="referral-review-notice" role="status">
-            <strong>Esta es una vista previa.</strong>
-            <p>
-              Los datos no se enviaron ni se guardaron. Podés volver a
-              editarlos; se perderán si recargás o salís de la página.
-            </p>
+          {submitted && (
+            <div className="referral-review-notice" role="status">
+              <strong>Tu referido ya está registrado.</strong>
+              <p>Gracias por acercarnos a alguien de tu red.</p>
+            </div>
+          )}
+          {error && <p role="alert">{error}</p>}
+          <div className="referral-review-actions">
+            {!submitted && (
+              <button
+                className="referral-primary-button"
+                type="button"
+                disabled={pending}
+                onClick={submitReferral}
+              >
+                {pending ? "Enviando…" : "Enviar referido"}
+              </button>
+            )}
+            <button
+              className="referral-primary-button"
+              type="button"
+              disabled={pending}
+              onClick={() => {
+                if (submitted) form.current?.reset();
+                setSubmitted(false);
+                setError(null);
+                setDraft(null);
+              }}
+            >
+              {submitted ? "Referir a otra persona" : "← Volver a editar"}
+            </button>
           </div>
-          <button
-            className="referral-primary-button"
-            type="button"
-            onClick={() => setDraft(null)}
-          >
-            <span aria-hidden="true">←</span> Volver a editar
-          </button>
         </div>
       )}
     </section>

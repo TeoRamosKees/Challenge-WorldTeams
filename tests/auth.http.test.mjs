@@ -82,6 +82,20 @@ test("registro, confirmación, acceso y cierre de sesión contra la simulación 
     "Estas pruebas requieren el sustituto local, nunca Supabase real",
   );
   const browser = client();
+  const candidate = {
+    full_name: "  Nueva candidata  ",
+    email: "  NUEVA@EXAMPLE.COM  ",
+    profile_type: "engineering",
+    country: "Argentina",
+  };
+  const postReferral = (body, requester = browser) => requester.request("/api/referrals", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  assert.equal((await postReferral(candidate)).status, 401);
+  assert.equal((await browser.request("/api/referrals")).status, 405);
 
   assertProtected(await browser.request("/"));
   let result = await browser.submit("/register", {
@@ -128,6 +142,49 @@ test("registro, confirmación, acceso y cierre de sesión contra la simulación 
   result = await browser.request("/");
   assert.match(result.html, /Lucía García/);
   assert.match(result.html, /Cerrar sesión/);
+
+  for (const invalid of [
+    null, [], { ...candidate, email: "invalido" },
+    { ...candidate, full_name: "   " },
+    { ...candidate, profile_type: "invalid" },
+    { ...candidate, notes: "a".repeat(2001) },
+    { ...candidate, linkedin_url: "javascript:alert(1)" },
+    { ...candidate, country: 123 },
+  ]) {
+    assert.equal((await postReferral(invalid)).status, 400);
+  }
+  assert.equal((await browser.request("/api/referrals", { method: "POST", body: "texto" })).status, 415);
+  assert.equal((await browser.request("/api/referrals", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: "{",
+  })).status, 400);
+  result = await postReferral({ ...candidate, referrer_id: "otro-empleado", status: "hired", profile_embedding: [1] });
+  assert.equal(result.status, 201);
+  assert.ok(JSON.parse(result.html).referral.id);
+  let referrals = await (await fetch(`${mock}/__test/referrals`)).json();
+  assert.equal(referrals.length, 1);
+  assert.equal(referrals[0].email, "nueva@example.com");
+  assert.equal(referrals[0].referrer_id, "11111111-1111-4111-8111-111111111111");
+  const firstReferral = structuredClone(referrals);
+  result = await postReferral({ ...candidate, email: "nueva@example.com" });
+  assert.equal(result.status, 409);
+  assert.equal(JSON.parse(result.html).error, "Este candidato ya fue referido.");
+
+  const otherBrowser = client();
+  result = await otherBrowser.submit("/login", {
+    email: "sofia.martinez@example.com",
+    password,
+  });
+  assert.equal(result.status, 303);
+  result = await postReferral(candidate, otherBrowser);
+  assert.equal(result.status, 409);
+  assert.equal(JSON.parse(result.html).error, "Este candidato ya fue referido.");
+  referrals = await (await fetch(`${mock}/__test/referrals`)).json();
+  assert.deepEqual(referrals, firstReferral);
+  result = await postReferral({ ...candidate, email: "fallo@example.com" });
+  assert.equal(result.status, 500);
+  assert.doesNotMatch(result.html, /Falla interna ficticia/);
+  referrals = await (await fetch(`${mock}/__test/referrals`)).json();
+  assert.equal(referrals.length, 1);
 
   result = await browser.submit("/", {});
   assert.equal(result.location, "/login");
