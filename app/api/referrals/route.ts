@@ -103,8 +103,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // TODO: generar el embedding de profile_description y enviarlo a la RPC.
-    // Por ahora profile_embedding queda en NULL.
     const { data, error } = await createAdminClient().rpc("create_referral", {
       p_referrer_id: employee.id,
       p_email: fields.email,

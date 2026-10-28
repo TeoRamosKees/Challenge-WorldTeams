@@ -256,7 +256,7 @@ test("la RPC crea candidato qualified y referral sin embedding ni consentimiento
   const { rows: [candidate] } = await db.query("select * from public.candidates where id = $1", [referral.candidate_id]);
   assert.equal(candidate.email, "nuevo@example.com");
   assert.equal(candidate.status, "qualified");
-  assert.equal(candidate.profile_embedding, null);
+  assert.equal(Object.hasOwn(candidate, "profile_embedding"), false);
   assert.equal(candidate.consent_confirmed, false);
   assert.equal(candidate.country, null);
   assert.equal(candidate.notes, "Una recomendación");

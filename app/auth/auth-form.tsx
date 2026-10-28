@@ -43,7 +43,20 @@ export function AuthForm({
               : "Iniciá sesión con tu correo laboral para acceder al portal de referidos."}
           </p>
           {children}
-          <form action={action} className="auth-form">
+          <form
+            action={action}
+            className="auth-form"
+            onKeyDown={(event) => {
+              if (
+                event.key === "Enter" &&
+                !event.nativeEvent.isComposing &&
+                event.target instanceof HTMLInputElement
+              ) {
+                event.preventDefault();
+                if (!pending) event.currentTarget.requestSubmit();
+              }
+            }}
+          >
             <div className="referral-field">
               <label htmlFor="email">Correo laboral</label>
               <input

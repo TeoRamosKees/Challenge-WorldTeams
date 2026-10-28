@@ -57,7 +57,7 @@ Después de iniciar sesión, el empleado puede completar nombre, correo, país, 
 
 **Enviar referido** llama a `POST /api/referrals`. El endpoint valida la sesión confirmada y que el empleado siga activo; el referrer se obtiene de esa sesión, sin aceptar un ID enviado por el navegador. La pantalla conserva los datos ante errores y permite cargar otra persona después de un envío exitoso. La confirmación de consentimiento por parte del candidato sigue pendiente.
 
-Aplicar la migración `20261028174630_create_referral.sql` antes de usar el endpoint. La RPC `create_referral`, disponible solo para `service_role`, guarda candidato y referral en una única transacción. Los nuevos candidatos quedan con `status = 'qualified'`, `profile_embedding = NULL` y `consent_confirmed = false`; el punto donde se generará el embedding está marcado con un TODO.
+Aplicar las migraciones de `supabase/migrations` antes de usar el endpoint. La RPC `create_referral`, disponible solo para `service_role`, guarda candidato y referral en una única transacción. Los nuevos candidatos quedan con `status = 'qualified'` y `consent_confirmed = false`.
 
 El correo se normaliza con trim y minúsculas. Cada candidato puede tener un solo referral, incluso ante envíos concurrentes. Si ya fue referido por cualquier empleado, el endpoint devuelve `409` con el mensaje **Este candidato ya fue referido.**, conservando el candidato y el referrer originales. Un candidato existente sin referral se reutiliza sin sobrescribir su perfil o notas originales; si estaba `submitted`, pasa a `qualified`, y los estados posteriores se conservan. Los candidatos archivados no admiten nuevos referidos.
 

@@ -65,18 +65,20 @@ async function Landing() {
         </div>
       </header>
       <main className="portal-main">
-        <div className="portal-intro">
-          <p className="portal-eyebrow">PROGRAMA DE REFERIDOS</p>
-          <h1>
-            El próximo gran talento<br />
-            puede estar en tu red<span>.</span>
-          </h1>
-          <p>
-            Hola, {employee.full_name}. Presentanos a alguien con quien te
-            encantaría trabajar.
-          </p>
+        <div className="portal-hero">
+          <div className="portal-intro">
+            <p className="portal-eyebrow">PROGRAMA DE REFERIDOS</p>
+            <h1>
+              El próximo gran talento<br />
+              puede estar en tu red<span>.</span>
+            </h1>
+            <p>
+              Hola, {employee.full_name}. Presentanos a alguien con quien te
+              encantaría trabajar.
+            </p>
+          </div>
+          <ReferralProgramCard />
         </div>
-        <ReferralProgramCard />
         <div className="portal-form">
           <ReferralForm />
         </div>
@@ -105,18 +107,20 @@ function PortalLoading() {
         </div>
       </header>
       <main className="portal-main">
-        <div className="portal-intro">
-          <p className="portal-eyebrow">PROGRAMA DE REFERIDOS</p>
-          <h1>
-            El próximo gran talento<br />
-            puede estar en tu red<span>.</span>
-          </h1>
-          <p>
-            Qué bueno tenerte acá. Tu próxima recomendación puede abrir una gran
-            oportunidad.
-          </p>
+        <div className="portal-hero">
+          <div className="portal-intro">
+            <p className="portal-eyebrow">PROGRAMA DE REFERIDOS</p>
+            <h1>
+              El próximo gran talento<br />
+              puede estar en tu red<span>.</span>
+            </h1>
+            <p>
+              Qué bueno tenerte acá. Tu próxima recomendación puede abrir una gran
+              oportunidad.
+            </p>
+          </div>
+          <ReferralProgramCard />
         </div>
-        <ReferralProgramCard />
         <section
           className="referral-card portal-form portal-loading-card"
           aria-label="Cargando tu portal"
