@@ -146,12 +146,82 @@ body {
   margin-top: 36px;
 }
 
-.referral-card {
+.referral-card, .auth-card {
   min-width: 0;
   border: 1px solid var(--portal-line);
   border-radius: 16px;
   background: #fff;
   overflow: hidden;
+}
+
+.portal-loading-card {
+  padding: 24px 28px;
+}
+
+.portal-loading-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.portal-loading-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background: #779c37;
+  box-shadow: 0 0 0 5px #eef4e2;
+  animation: portal-loading-pulse 1.6s ease-in-out infinite alternate;
+}
+
+.portal-loading-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.portal-loading-description {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--portal-muted);
+}
+
+.portal-loading-fields {
+  margin-top: 28px;
+}
+
+.portal-skeleton-label,
+.portal-skeleton-input {
+  display: block;
+  border-radius: 7px;
+  background: #edf0e8;
+}
+
+.portal-skeleton-label {
+  width: 40%;
+  height: 10px;
+  margin: 4px 0;
+}
+
+.portal-skeleton-input {
+  height: 44px;
+}
+
+.portal-skeleton-textarea {
+  height: 96px;
+}
+
+@keyframes portal-loading-pulse {
+  from { opacity: .4; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-loading-dot {
+    animation: none;
+  }
 }
 
 .referral-card-header {
@@ -338,8 +408,13 @@ body {
   transition: background .15s;
 }
 
-.referral-primary-button:hover {
+.referral-primary-button:hover:not(:disabled) {
   background: #16382f;
+}
+
+.referral-primary-button:disabled {
+  opacity: .6;
+  cursor: wait;
 }
 
 .referral-primary-button > span {
@@ -396,7 +471,103 @@ body {
   color: #5a6953;
 }
 
+.auth-portal {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.auth-main {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(32px, 8svh, 80px) 24px 32px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 520px;
+  padding: 28px;
+}
+
+.auth-card h1 {
+  margin-top: 10px;
+  font-size: 32px;
+  font-weight: 550;
+  letter-spacing: -1.1px;
+  line-height: 1.2;
+}
+
+.auth-description {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--portal-muted);
+  line-height: 1.7;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.auth-feedback {
+  border: 1px solid;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.auth-card > .auth-feedback {
+  margin-top: 20px;
+}
+
+.auth-feedback-error {
+  border-color: #eed9d4;
+  background: #fcf2ef;
+  color: #963f30;
+}
+
+.auth-feedback-success {
+  border-color: #dce5cd;
+  background: #f1f6e8;
+  color: #52662e;
+}
+
+.auth-switch {
+  margin-top: 20px;
+  border-top: 1px solid var(--portal-line);
+  padding-top: 16px;
+  font-size: 12px;
+  color: var(--portal-muted);
+  line-height: 1.7;
+}
+
+.auth-switch a {
+  font-weight: 600;
+  color: var(--portal-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth-switch a:hover {
+  color: #567a2b;
+}
+
+.auth-footer {
+  width: calc(100% - 80px);
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
 @media (max-width: 900px) {
+  .auth-footer {
+    width: calc(100% - 48px);
+  }
   .portal-main {
     padding: 40px 24px 0;
   }
@@ -421,6 +592,22 @@ body {
 }
 
 @media (max-width: 700px) {
+  .portal-loading-card {
+    padding: 24px 20px;
+  }
+  .auth-main {
+    padding: 24px 20px;
+  }
+  .auth-card {
+    padding: 24px 20px;
+  }
+  .auth-card h1 {
+    font-size: 28px;
+  }
+  .portal-footer.auth-footer {
+    width: calc(100% - 40px);
+    margin-top: 0;
+  }
   .referral-fields {
     grid-template-columns: 1fr;
   }

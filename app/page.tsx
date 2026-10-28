@@ -56,15 +56,78 @@ async function Landing() {
   );
 }
 
+function PortalLoading() {
+  return (
+    <div className="referral-portal">
+      <header className="portal-header">
+        <div className="portal-header-inner">
+          <Link className="portal-brand" href="/" aria-label="WorldTeams, inicio">
+            <span className="portal-brand-mark" aria-hidden="true">
+              w.
+            </span>
+            <span>
+              worldteams<span className="portal-brand-dot">.</span>
+            </span>
+          </Link>
+        </div>
+      </header>
+      <main className="portal-main">
+        <div className="portal-intro">
+          <p className="portal-eyebrow">PROGRAMA DE REFERIDOS</p>
+          <h1>
+            El próximo gran talento<br />
+            puede estar en tu red<span>.</span>
+          </h1>
+          <p>
+            Qué bueno tenerte acá. Tu próxima recomendación puede abrir una gran
+            oportunidad.
+          </p>
+        </div>
+        <section
+          className="referral-card portal-form portal-loading-card"
+          aria-label="Cargando tu portal"
+        >
+          <div className="portal-loading-status" role="status">
+            <span className="portal-loading-dot" aria-hidden="true" />
+            <div>
+              <p className="portal-loading-title">
+                Estamos preparando tu espacio…
+              </p>
+              <p className="portal-loading-description">
+                Enseguida vas a poder presentarnos a alguien con quien te
+                encantaría trabajar.
+              </p>
+            </div>
+          </div>
+          <div
+            className="referral-fields portal-loading-fields"
+            aria-hidden="true"
+          >
+            {Array.from({ length: 7 }, (_, index) => (
+              <div
+                className={`referral-field${index >= 3 ? " referral-field-half" : ""}`}
+                key={index}
+              >
+                <span className="portal-skeleton-label" />
+                <span
+                  className={`portal-skeleton-input${index >= 5 ? " portal-skeleton-textarea" : ""}`}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+        <footer className="portal-footer">
+          <span>WorldTeams · Conectamos personas y oportunidades.</span>
+          <span>Programa de referidos</span>
+        </footer>
+      </main>
+    </div>
+  );
+}
+
 export default function Page() {
   return (
-    <Suspense
-      fallback={
-        <p className="p-8" role="status">
-          Cargando tu portal…
-        </p>
-      }
-    >
+    <Suspense fallback={<PortalLoading />}>
       <Landing />
     </Suspense>
   );
