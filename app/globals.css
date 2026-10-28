@@ -24,3 +24,453 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.referral-portal {
+  --portal-ink: #183b36;
+  --portal-muted: #667670;
+  --portal-line: #dfe5df;
+  min-height: 100vh;
+  background: #f6f7f2;
+  color: var(--portal-ink);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  color-scheme: light;
+}
+
+.portal-header {
+  border-bottom: 1px solid var(--portal-line);
+  background: #fff;
+}
+
+.portal-header-inner {
+  max-width: 1200px;
+  margin: auto;
+  padding: 22px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.portal-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 26px;
+  font-weight: 750;
+  letter-spacing: -1.3px;
+  text-decoration: none;
+}
+
+.portal-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 37px;
+  height: 37px;
+  background: #d9ef83;
+  border-radius: 10px;
+  font-size: 26px;
+  letter-spacing: -3px;
+  padding-right: 3px;
+}
+
+.portal-brand-dot {
+  color: #6d8d39;
+}
+
+.portal-account {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.portal-account-details {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.portal-account-details span:last-child {
+  color: var(--portal-muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.portal-logout {
+  padding: 10px 15px;
+  border: 1px solid var(--portal-line);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #fff;
+}
+
+.portal-logout:hover {
+  background: #f2f5ed;
+}
+
+.portal-main {
+  max-width: 1200px;
+  margin: auto;
+  padding: 54px 40px 0;
+}
+
+.portal-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+}
+
+.portal-intro h1 {
+  margin: 15px 0 18px;
+  font-size: clamp(32px, 3.6vw, 46px);
+  line-height: 1.13;
+  letter-spacing: -1.9px;
+  font-weight: 550;
+}
+
+.portal-intro h1 span {
+  color: #779c37;
+}
+
+.portal-intro > p:last-child {
+  font-size: 14px;
+  color: var(--portal-muted);
+  line-height: 1.7;
+}
+
+.portal-form {
+  margin-top: 36px;
+}
+
+.referral-card {
+  min-width: 0;
+  border: 1px solid var(--portal-line);
+  border-radius: 16px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.referral-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 32px;
+  border-bottom: 1px solid var(--portal-line);
+}
+
+.referral-section-label {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+}
+
+.referral-preview-badge {
+  border: 1px solid #dce5cd;
+  background: #f1f6e8;
+  color: #52662e;
+  border-radius: 5px;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.referral-card form, .referral-review {
+  padding: 24px 28px;
+}
+
+.referral-card form[hidden] {
+  display: none;
+}
+
+.referral-form-intro h2 {
+  font-size: 23px;
+  font-weight: 550;
+  letter-spacing: -.7px;
+  line-height: 1.3;
+}
+
+.referral-form-intro > p {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--portal-muted);
+  line-height: 1.6;
+}
+
+.referral-form-intro .referral-required-note {
+  margin-top: 17px;
+  font-size: 11px;
+}
+
+.referral-edit-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-bottom: 20px;
+}
+
+.referral-edit-intro > p,
+.referral-edit-intro .referral-required-note {
+  margin-top: 0;
+}
+
+.referral-fields {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px 18px;
+  align-items: start;
+}
+
+.referral-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  grid-column: span 2;
+}
+
+.referral-field-half {
+  grid-column: span 3;
+}
+
+.referral-field label {
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.5;
+}
+
+.referral-field label > span:not(.referral-optional), .referral-required-note span {
+  color: #567a2b;
+}
+
+.referral-optional {
+  margin-left: 5px;
+  font-size: 10px;
+  color: var(--portal-muted);
+  font-weight: 400;
+}
+
+.referral-field input, .referral-field select, .referral-field textarea {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #d9e1da;
+  border-radius: 7px;
+  background: #fff;
+  padding: 11px 13px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--portal-ink);
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.referral-field textarea {
+  resize: vertical;
+  min-height: 96px;
+}
+
+.referral-field input::placeholder, .referral-field textarea::placeholder {
+  color: #7c8881;
+  opacity: 1;
+}
+
+.referral-field select:has(option:checked[value=""]) {
+  color: #7c8881;
+}
+
+.referral-field input:focus, .referral-field select:focus, .referral-field textarea:focus {
+  outline: none;
+  border-color: #638954;
+  box-shadow: 0 0 0 3px #eaf1df;
+}
+
+.referral-portal button:focus-visible, .referral-portal a:focus-visible, .referral-form-intro h2:focus-visible, .referral-edit-intro:focus-visible {
+  outline: 2px solid #638954;
+  outline-offset: 4px;
+}
+
+.referral-field-hint {
+  font-size: 10px;
+  color: var(--portal-muted);
+  line-height: 1.6;
+}
+
+.referral-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  margin-top: 20px;
+  border-top: 1px solid var(--portal-line);
+  padding-top: 18px;
+}
+
+.referral-form-footer > p {
+  max-width: 400px;
+  color: var(--portal-muted);
+  font-size: 11px;
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+.referral-form-footer .referral-primary-button {
+  flex-shrink: 0;
+}
+
+.referral-primary-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  background: #234a40;
+  color: #fff;
+  border: 1px solid #234a40;
+  border-radius: 8px;
+  padding: 13px 22px;
+  font-size: 12px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.referral-primary-button:hover {
+  background: #16382f;
+}
+
+.referral-primary-button > span {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.portal-footer {
+  margin-top: 48px;
+  border-top: 1px solid var(--portal-line);
+  padding: 23px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 10px;
+  color: var(--portal-muted);
+  line-height: 1.7;
+}
+
+.referral-review-data {
+  display: grid;
+  gap: 19px;
+  margin: 28px 0;
+}
+
+.referral-review-data > div {
+  padding-bottom: 17px;
+  border-bottom: 1px solid var(--portal-line);
+}
+
+.referral-review-data dt {
+  font-size: 11px;
+  color: var(--portal-muted);
+  margin-bottom: 7px;
+}
+
+.referral-review-data dd {
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.referral-review-notice {
+  background: #f1f5e9;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.8;
+  margin-bottom: 22px;
+}
+
+.referral-review-notice p {
+  color: #5a6953;
+}
+
+@media (max-width: 900px) {
+  .portal-main {
+    padding: 40px 24px 0;
+  }
+  .portal-header-inner {
+    padding: 18px 24px;
+  }
+  .referral-card-header {
+    padding: 18px 24px;
+  }
+  .referral-card form, .referral-review {
+    padding: 26px 24px;
+  }
+  .referral-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .referral-field {
+    grid-column: auto;
+  }
+  .referral-field-linkedin {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .referral-fields {
+    grid-template-columns: 1fr;
+  }
+  .referral-form-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .portal-header-inner {
+    padding: 16px 20px;
+    gap: 12px;
+  }
+  .portal-brand {
+    font-size: 23px;
+    gap: 9px;
+  }
+  .portal-account-details {
+    display: none;
+  }
+  .portal-logout {
+    padding: 9px 11px;
+    font-size: 11px;
+  }
+  .portal-main {
+    padding: 34px 20px 0;
+  }
+  .portal-intro h1 {
+    font-size: 34px;
+    letter-spacing: -1.3px;
+  }
+  .portal-form {
+    margin-top: 27px;
+  }
+  .referral-form-intro h2 {
+    font-size: 21px;
+  }
+  .referral-card-header {
+    padding: 17px 20px;
+  }
+  .referral-card form, .referral-review {
+    padding: 24px 20px;
+  }
+  .referral-field input, .referral-field select, .referral-field textarea {
+    font-size: 16px;
+  }
+  .referral-primary-button {
+    width: 100%;
+  }
+  .portal-footer {
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 32px;
+  }
+}

@@ -44,12 +44,18 @@ Completar `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` co
 - `/register`: recibe correo laboral y contraseña. Supabase rechaza el alta si el correo no corresponde a un empleado activo sin cuenta vinculada, incluso si se llama a Auth directamente.
 - `/auth/confirm`: verifica el enlace enviado por correo. Un trigger vincula la identidad confirmada mediante `referrers.auth_user_id`; luego el usuario puede iniciar sesión.
 - `/login`: comprueba las credenciales y que la cuenta esté vinculada a un empleado activo.
-- `/`: página protegida. Verifica la sesión y el estado del empleado en cada acceso. El botón **Cerrar sesión** elimina la sesión.
+- `/`: página protegida con el formulario de nuevo referido. Verifica la sesión y el estado del empleado en cada acceso. El botón **Cerrar sesión** elimina la sesión.
 - `proxy.ts`: mantiene actualizados los tokens y las cookies de sesión.
 
 Las políticas permiten leer únicamente el perfil, los referidos, los candidatos referidos y las recompensas del empleado conectado. No otorgan escrituras sobre las tablas de negocio. Desactivar `referrers.active` bloquea el acceso y la lectura de datos aunque el token no haya vencido. El vínculo usa el ID de Auth después de la confirmación; cambiar el correo no reasigna referidos.
 
 El archivo `supabase/seed.sql` contiene empleados ficticios de desarrollo; no crea cuentas ni contraseñas de Auth.
+
+## Formulario de referidos
+
+Después de iniciar sesión, el empleado puede completar nombre, correo, país, LinkedIn, área profesional, experiencia y recomendación. Nombre, correo y área son obligatorios. **Revisar referido** valida los campos y muestra una vista previa; **Volver a editar** conserva lo ingresado.
+
+El formulario funciona únicamente en memoria del navegador: no llama a un endpoint, no escribe en Supabase y no persiste datos al recargar o salir. El envío y la confirmación de consentimiento por parte del candidato quedan pendientes de la futura integración.
 
 ## Verificación
 
