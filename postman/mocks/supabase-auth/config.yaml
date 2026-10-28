@@ -1,0 +1,9 @@
+version: 1
+name: Supabase Auth de prueba
+slug: supabase-auth
+protocol: http
+interceptRequests: true
+scenarios:
+  - name: default
+    path: ./default.cjs
+    default: true

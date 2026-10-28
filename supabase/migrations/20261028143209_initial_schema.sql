@@ -29,7 +29,7 @@ create table public.candidates (
   profile_description text,                              -- texto libre del perfil
   profile_embedding   extensions.vector(1536),           -- embedding de profile_description
   notes               text,                              -- por qué lo recomienda el empleado
-  consent_confirmed   boolean not null default false,    -- el empleado declara que el candidato aceptó
+  consent_confirmed   boolean not null default false,    -- el candidato recibio un correo y aceptó sus datos cargados
   status              text not null default 'submitted'
                       check (status in ('submitted', 'hired', 'rejected')),
   hired_at            timestamptz,

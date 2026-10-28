@@ -1,0 +1,6 @@
+simulation: employee-auth
+routing: path
+mocks:
+  - name: Supabase Auth
+    routeKey: supabase
+    path: postman/mocks/supabase-auth/config.yaml
